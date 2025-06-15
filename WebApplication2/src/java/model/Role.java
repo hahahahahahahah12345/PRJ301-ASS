@@ -5,24 +5,29 @@
 package model;
 
 public class Role {
-    private int id;
-    private String name;
+    private int rid;
+    private String rname;
 
-    public void setId(int id) {
-        this.id = id;
+    public Role() {}
+
+    public Role(int rid, String rname) {
+        this.rid = rid;
+        this.rname = rname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public int getRid() {
+        return rid;
     }
 
-    public int getId() {
-        return id;
+    public void setRid(int rid) {
+        this.rid = rid;
     }
 
-    public String getName() {
-        return name;
+    public String getRname() {
+        return rname;
     }
 
-    
+    public void setRname(String rname) {
+        this.rname = rname;
+    }
 }

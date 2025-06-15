@@ -5,24 +5,29 @@
 package model;
 
 public class Department {
-    private int id;
-    private String name;
+    private int did;
+    private String dname;
 
-    public int getId() {
-        return id;
+    public Department() {}
+
+    public Department(int did, String dname) {
+        this.did = did;
+        this.dname = dname;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getDid() {
+        return did;
     }
 
-    public String getName() {
-        return name;
+    public void setDid(int did) {
+        this.did = did;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getDname() {
+        return dname;
     }
 
-   
+    public void setDname(String dname) {
+        this.dname = dname;
+    }
 }

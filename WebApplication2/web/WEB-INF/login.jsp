@@ -6,24 +6,28 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <html>
 <head>
-    <title>Login</title>
+    <title>Đăng nhập hệ thống</title>
 </head>
 <body>
-<h2>Login system</h2>
+<h2>Đăng nhập</h2>
 
-<form action="login" method="post">
-    <label>User:</label><br>
-    <input type="text" name="username" required><br><br>
-    <label>Password:</label><br>
-    <input type="password" name="password" required><br><br>
-    <input type="submit" value="Login">
+<c:if test="${not empty error}">
+    <div style="color:red">${error}</div>
+</c:if>
+
+<form method="post" action="${pageContext.request.contextPath}/login">
+    <label>Tên đăng nhập:</label><br/>
+    <input type="text" name="username" required/><br/><br/>
+
+    <label>Mật khẩu:</label><br/>
+    <input type="password" name="password" required/><br/><br/>
+
+    <button type="submit">Đăng nhập</button>
 </form>
-
-<% if (request.getAttribute("error") != null) { %>
-    <p style="color:red"><%= request.getAttribute("error") %></p>
-<% } %>
-
 </body>
 </html>
