@@ -1,13 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-
-/**
- *
- * @author Ha
- */
 package dal;
 
 import model.User;
@@ -21,12 +11,10 @@ public class UserDAL {
         this.connection = connection;
     }
 
-    // Lấy user theo username để dùng login
     public User getUserByUsername(String username) throws SQLException {
-        String sql = "SELECT u.uid, u.username, u.password, u.fullname, u.did, ur.rid, r.rname " +
+        String sql = "SELECT u.uid, u.username, u.password, u.fullname, u.did, u.rid, u.manager_id, r.rname " +
                      "FROM [User] u " +
-                     "LEFT JOIN User_Role ur ON u.uid = ur.uid " +
-                     "LEFT JOIN Role r ON ur.rid = r.rid " +
+                     "LEFT JOIN Role r ON u.rid = r.rid " +
                      "WHERE u.username = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
@@ -35,10 +23,11 @@ public class UserDAL {
                     User user = new User();
                     user.setUid(rs.getInt("uid"));
                     user.setUsername(rs.getString("username"));
-                    user.setPassword(rs.getString("password"));
+                    user.setPassword(rs.getString("password")); // Lưu password đã mã hóa
                     user.setFullname(rs.getString("fullname"));
-                    user.setDid(rs.getInt("did"));
-                    user.setRid(rs.getInt("rid"));
+                    user.setDepId(rs.getInt("did"));
+                    user.setRoleId(rs.getInt("rid"));
+                    user.setManagerId(rs.getInt("manager_id") != 0 ? rs.getInt("manager_id") : null);
                     user.setRname(rs.getString("rname"));
                     return user;
                 }
@@ -47,4 +36,3 @@ public class UserDAL {
         return null;
     }
 }
-

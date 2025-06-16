@@ -1,17 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-
-/**
- *
- * @author Ha
- */
 package controller;
 
 import dal.UserDAL;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,7 +10,6 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
@@ -30,12 +20,15 @@ public class LoginServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            connection = DriverManager.getConnection(
-                    "jdbc:sqlserver://localhost:1433;databaseName=YourDBName;user=sa;password=YourPassword");
+            connection = dal.DBContext.getConnection();
         } catch (Exception e) {
             throw new ServletException(e);
         }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.getRequestDispatcher("/login.jsp").forward(req, resp);
     }
 
     @Override
@@ -47,10 +40,10 @@ public class LoginServlet extends HttpServlet {
 
         try {
             User user = userDAL.getUserByUsername(username);
-            if (user != null && user.getPassword().equals(password)) {
+            if (user != null && BCrypt.checkpw(password, user.getPassword())) {
                 HttpSession session = req.getSession();
                 session.setAttribute("user", user);
-                resp.sendRedirect(req.getContextPath() + "/home");
+                resp.sendRedirect(req.getContextPath() + "/dashboard");
             } else {
                 req.setAttribute("error", "Sai tên đăng nhập hoặc mật khẩu");
                 req.getRequestDispatcher("/login.jsp").forward(req, resp);
@@ -63,7 +56,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     public void destroy() {
         try {
-            if(connection != null && !connection.isClosed()){
+            if (connection != null && !connection.isClosed()) {
                 connection.close();
             }
         } catch (SQLException e) {
