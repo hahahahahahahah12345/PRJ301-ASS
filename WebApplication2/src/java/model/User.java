@@ -4,11 +4,6 @@
  */
 package model;
 
-/**
- *
- * @author Ha
- */
-
 public class User {
     private int uid;
     private String username;
@@ -17,12 +12,12 @@ public class User {
     private int depId;
     private int roleId;
     private Integer managerId;
+    private String rname;
 
-    // Constructors, Getters, Setters
     public User() {}
 
     public User(int uid, String username, String password, String fullname,
-                int depId, int roleId, Integer managerId) {
+                int depId, int roleId, Integer managerId, String rname) {
         this.uid = uid;
         this.username = username;
         this.password = password;
@@ -30,9 +25,9 @@ public class User {
         this.depId = depId;
         this.roleId = roleId;
         this.managerId = managerId;
+        this.rname = rname;
     }
 
-    // Getter & Setter
     public int getUid() { return uid; }
     public void setUid(int uid) { this.uid = uid; }
 
@@ -54,17 +49,9 @@ public class User {
     public Integer getManagerId() { return managerId; }
     public void setManagerId(Integer managerId) { this.managerId = managerId; }
 
-    public void setDid(int aInt) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    public String getRname() { return rname; }
+    public void setRname(String rname) { this.rname = rname; }
 
-    public void setRid(int aInt) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setRname(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    public void setDid(int did) { this.depId = did; }
+    public void setRid(int rid) { this.roleId = rid; }
 }
-
- 

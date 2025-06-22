@@ -1,11 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
-
-
-
 
 import java.sql.Date;
 
@@ -18,11 +11,12 @@ public class Request {
     private int createdBy;
     private Integer processedBy;
     private Date processedDate;
+    private String comment;
 
     public Request() {}
 
     public Request(int requestId, Date fromDate, Date toDate, String reason, String status,
-                   int createdBy, Integer processedBy, Date processedDate) {
+                   int createdBy, Integer processedBy, Date processedDate, String comment) {
         this.requestId = requestId;
         this.fromDate = fromDate;
         this.toDate = toDate;
@@ -31,73 +25,33 @@ public class Request {
         this.createdBy = createdBy;
         this.processedBy = processedBy;
         this.processedDate = processedDate;
+        this.comment = comment;
     }
 
-    public int getRequestId() {
-        return requestId;
-    }
+    public int getRequestId() { return requestId; }
+    public void setRequestId(int requestId) { this.requestId = requestId; }
 
-    public void setRequestId(int requestId) {
-        this.requestId = requestId;
-    }
+    public Date getFromDate() { return fromDate; }
+    public void setFromDate(Date fromDate) { this.fromDate = fromDate; }
 
-    public Date getFromDate() {
-        return fromDate;
-    }
+    public Date getToDate() { return toDate; }
+    public void setToDate(Date toDate) { this.toDate = toDate; }
 
-    public void setFromDate(Date fromDate) {
-        this.fromDate = fromDate;
-    }
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
 
-    public Date getToDate() {
-        return toDate;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setToDate(Date toDate) {
-        this.toDate = toDate;
-    }
+    public int getCreatedBy() { return createdBy; }
+    public void setCreatedBy(int createdBy) { this.createdBy = createdBy; }
 
-    public String getReason() {
-        return reason;
-    }
+    public Integer getProcessedBy() { return processedBy; }
+    public void setProcessedBy(Integer processedBy) { this.processedBy = processedBy; }
 
-    public void setReason(String reason) {
-        this.reason = reason;
-    }
+    public Date getProcessedDate() { return processedDate; }
+    public void setProcessedDate(Date processedDate) { this.processedDate = processedDate; }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public int getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(int createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Integer getProcessedBy() {
-        return processedBy;
-    }
-
-    public void setProcessedBy(Integer processedBy) {
-        this.processedBy = processedBy;
-    }
-
-    public Date getProcessedDate() {
-        return processedDate;
-    }
-
-    public void setProcessedDate(Date processedDate) {
-        this.processedDate = processedDate;
-    }
-
-    public void setComment(String comment) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
 }

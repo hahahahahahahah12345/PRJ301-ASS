@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dal;
 
 import model.User;
@@ -59,18 +55,6 @@ public class AgendaDAL {
                     agenda.add(rs.getInt("userId") + ":" + rs.getDate("date") + ":" + rs.getString("status"));
                 }
             }
-        }
-        // Thêm trạng thái 'Working' mặc định
-        List<User> users = getUsersByDepartment(did);
-        Date current = new Date(startDate.getTime());
-        while (!current.after(endDate)) {
-            for (User user : users) {
-                String key = user.getUid() + ":" + current.toString();
-                if (!agenda.stream().anyMatch(a -> a.startsWith(key))) {
-                    agenda.add(key + ":Working");
-                }
-            }
-            current = new Date(current.getTime() + 24 * 60 * 60 * 1000);
         }
         return agenda;
     }

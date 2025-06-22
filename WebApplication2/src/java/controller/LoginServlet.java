@@ -2,7 +2,6 @@ package controller;
 
 import dal.UserDAL;
 import model.User;
-import org.mindrot.jbcrypt.BCrypt;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -40,7 +39,7 @@ public class LoginServlet extends HttpServlet {
 
         try {
             User user = userDAL.getUserByUsername(username);
-            if (user != null && BCrypt.checkpw(password, user.getPassword())) {
+            if (user != null && user.getPassword().equals(password)) { // TODO: Sử dụng bcrypt
                 HttpSession session = req.getSession();
                 session.setAttribute("user", user);
                 resp.sendRedirect(req.getContextPath() + "/dashboard");

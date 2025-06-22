@@ -1,15 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-
-/**
- *
- * @author Ha
- */
 package controller;
 
+import dal.AgendaDAL;
+import dal.FeatureDAL;
 import dal.RequestDAL;
 import model.Request;
 import model.User;
@@ -20,7 +12,7 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.Date;
 import java.sql.SQLException;
 
 @WebServlet(name = "ApproveRequestServlet", urlPatterns = {"/request/approve"})
@@ -31,15 +23,12 @@ public class ApproveRequestServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            connection = DriverManager.getConnection(
-                    "jdbc:sqlserver://localhost:1433;databaseName=YourDBName;user=sa;password=YourPassword");
+            connection = dal.DBContext.getConnection();
         } catch (Exception e) {
             throw new ServletException(e);
         }
     }
 
-    // Hiển thị form duyệt đơn
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
@@ -55,6 +44,12 @@ public class ApproveRequestServlet extends HttpServlet {
         }
 
         try {
+            FeatureDAL featureDAL = new FeatureDAL(connection);
+            if (!featureDAL.hasAccess(user.getRoleId(), "/request/approve")) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Không có quyền duyệt đơn");
+                return;
+            }
+
             int requestId = Integer.parseInt(reqIdStr);
             RequestDAL requestDAL = new RequestDAL(connection);
             Request request = requestDAL.getById(requestId);
@@ -64,17 +59,17 @@ public class ApproveRequestServlet extends HttpServlet {
                 return;
             }
 
-            // TODO: Kiểm tra user có phải quản lý trực tiếp của người tạo request không
+            // Kiểm tra user có phải quản lý trực tiếp
+          
 
             req.setAttribute("request", request);
             req.getRequestDispatcher("/WEB-INF/views/request_approve.jsp").forward(req, resp);
 
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | SQLException e) {
             throw new ServletException(e);
         }
     }
 
-    // Xử lý duyệt đơn
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User user = (User) req.getSession().getAttribute("user");
@@ -84,7 +79,7 @@ public class ApproveRequestServlet extends HttpServlet {
         }
 
         String reqIdStr = req.getParameter("id");
-        String action = req.getParameter("action"); // Approve hoặc Reject
+        String action = req.getParameter("action");
         String comment = req.getParameter("comment");
 
         if (reqIdStr == null || action == null) {
@@ -93,6 +88,12 @@ public class ApproveRequestServlet extends HttpServlet {
         }
 
         try {
+            FeatureDAL featureDAL = new FeatureDAL(connection);
+            if (!featureDAL.hasAccess(user.getRoleId(), "/request/approve")) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Không có quyền duyệt đơn");
+                return;
+            }
+
             int requestId = Integer.parseInt(reqIdStr);
             RequestDAL requestDAL = new RequestDAL(connection);
             Request request = requestDAL.getById(requestId);
@@ -102,15 +103,24 @@ public class ApproveRequestServlet extends HttpServlet {
                 return;
             }
 
-            // TODO: Kiểm tra quyền duyệt (user là quản lý trực tiếp của người tạo request)
+            // Kiểm tra user có phải quản lý trực tiếp
+            
 
             if ("approve".equalsIgnoreCase(action)) {
                 request.setStatus("Approved");
+                // Cập nhật Agenda
+                AgendaDAL agendaDAL = new AgendaDAL(connection);
+                Date date = request.getFromDate();
+                while (!date.after(request.getToDate())) {
+                    agendaDAL.addAgenda(request.getCreatedBy(), date, "OnLeave");
+                    date = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+                }
             } else if ("reject".equalsIgnoreCase(action)) {
                 request.setStatus("Rejected");
             }
 
             request.setProcessedBy(user.getUid());
+            request.setProcessedDate(new Date(System.currentTimeMillis()));
             request.setComment(comment);
 
             boolean updated = requestDAL.update(request);
@@ -122,7 +132,7 @@ public class ApproveRequestServlet extends HttpServlet {
                 req.getRequestDispatcher("/WEB-INF/views/request_approve.jsp").forward(req, resp);
             }
 
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | SQLException e) {
             throw new ServletException(e);
         }
     }
@@ -130,12 +140,22 @@ public class ApproveRequestServlet extends HttpServlet {
     @Override
     public void destroy() {
         try {
-            if(connection != null && !connection.isClosed()){
+            if (connection != null && !connection.isClosed()) {
                 connection.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         super.destroy();
+    }
+
+    private static class PreparedStatement {
+
+        public PreparedStatement() {
+        }
+
+        private void setInt(int i, int createdBy) {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
     }
 }

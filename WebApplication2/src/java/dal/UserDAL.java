@@ -5,7 +5,7 @@ import model.User;
 import java.sql.*;
 
 public class UserDAL {
-    private final Connection connection;
+    private Connection connection;
 
     public UserDAL(Connection connection) {
         this.connection = connection;
@@ -23,7 +23,7 @@ public class UserDAL {
                     User user = new User();
                     user.setUid(rs.getInt("uid"));
                     user.setUsername(rs.getString("username"));
-                    user.setPassword(rs.getString("password")); // Lưu password đã mã hóa
+                    user.setPassword(rs.getString("password"));
                     user.setFullname(rs.getString("fullname"));
                     user.setDepId(rs.getInt("did"));
                     user.setRoleId(rs.getInt("rid"));

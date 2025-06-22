@@ -1,6 +1,5 @@
 package controller;
 
-import dal.FeatureDAL;
 import dal.RequestDAL;
 import model.Request;
 import model.User;
@@ -13,6 +12,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet(name = "CreateRequestServlet", urlPatterns = {"/request/create"})
 public class CreateRequestServlet extends HttpServlet {
@@ -35,16 +36,7 @@ public class CreateRequestServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
-        try {
-            FeatureDAL featureDAL = new FeatureDAL(connection);
-            if (!featureDAL.hasAccess(user.getRoleId(), "/request/create")) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Không có quyền tạo đơn");
-                return;
-            }
-            req.getRequestDispatcher("/WEB-INF/views/request_create.jsp").forward(req, resp);
-        } catch (SQLException e) {
-            throw new ServletException(e);
-        }
+        req.getRequestDispatcher("/WEB-INF/views/request_create.jsp").forward(req, resp);
     }
 
     @Override
@@ -55,26 +47,13 @@ public class CreateRequestServlet extends HttpServlet {
             return;
         }
 
+        String fromDateStr = req.getParameter("fromDate");
+        String toDateStr = req.getParameter("toDate");
+        String reason = req.getParameter("reason");
+
         try {
-            FeatureDAL featureDAL = new FeatureDAL(connection);
-            if (!featureDAL.hasAccess(user.getRoleId(), "/request/create")) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Không có quyền tạo đơn");
-                return;
-            }
-
-            String fromDateStr = req.getParameter("fromDate");
-            String toDateStr = req.getParameter("toDate");
-            String reason = req.getParameter("reason");
-
             Date fromDate = Date.valueOf(fromDateStr);
             Date toDate = Date.valueOf(toDateStr);
-
-            // Kiểm tra toDate >= fromDate
-            if (toDate.before(fromDate)) {
-                req.setAttribute("error", "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu");
-                req.getRequestDispatcher("/WEB-INF/views/request_create.jsp").forward(req, resp);
-                return;
-            }
 
             Request request = new Request();
             request.setFromDate(fromDate);
@@ -84,10 +63,14 @@ public class CreateRequestServlet extends HttpServlet {
             request.setStatus("Inprogress");
 
             RequestDAL requestDAL = new RequestDAL(connection);
-            boolean success = requestDAL.add(request);
+            boolean success = false;
+            try {
+                success = requestDAL.add(request);
+            } catch (SQLException ex) {
+                Logger.getLogger(CreateRequestServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             if (success) {
-                req.getSession().setAttribute("success", "Tạo đơn thành công");
                 resp.sendRedirect(req.getContextPath() + "/request/list");
             } else {
                 req.setAttribute("error", "Tạo đơn thất bại");
@@ -96,8 +79,6 @@ public class CreateRequestServlet extends HttpServlet {
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", "Ngày không hợp lệ");
             req.getRequestDispatcher("/WEB-INF/views/request_create.jsp").forward(req, resp);
-        } catch (SQLException e) {
-            throw new ServletException(e);
         }
     }
 
