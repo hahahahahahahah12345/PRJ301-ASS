@@ -5,7 +5,7 @@ import model.User;
 import java.sql.*;
 
 public class UserDAL {
-    private Connection connection;
+    private final Connection connection;
 
     public UserDAL(Connection connection) {
         this.connection = connection;
